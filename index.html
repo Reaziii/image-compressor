@@ -324,6 +324,16 @@
         margin-left: 1rem;
         min-width: 80px;
         text-align: center;
+        border: none;
+        outline: none;
+        cursor: text;
+        transition: all 0.3s ease;
+      }
+      
+      .slider-value:focus {
+        background: white;
+        color: var(--text-primary);
+        box-shadow: 0 0 0 2px var(--primary-solid);
       }
 
       .preview-container {
@@ -643,7 +653,7 @@
           <div class="control-card">
             <div class="control-title">
               <div class="control-icon">📏</div>
-              Width: <span class="slider-value" id="widthValue">100%</span>
+              Width: <input type="text" class="slider-value" id="widthValue" value="100" /> px
             </div>
             <div class="slider-container">
               <input
@@ -660,7 +670,7 @@
           <div class="control-card">
             <div class="control-title">
               <div class="control-icon">📐</div>
-              Height: <span class="slider-value" id="heightValue">100%</span>
+              Height: <input type="text" class="slider-value" id="heightValue" value="100" /> px
             </div>
             <div class="slider-container">
               <input
@@ -677,7 +687,7 @@
           <div class="control-card">
             <div class="control-title">
               <div class="control-icon">⚡</div>
-              Quality: <span class="slider-value" id="qualityValue">85%</span>
+              Quality: <input type="text" class="slider-value" id="qualityValue" value="85" /> %
             </div>
             <div class="slider-container">
               <input
@@ -766,6 +776,11 @@
           this.uploadArea.addEventListener("click", () =>
             this.fileInput.click()
           );
+
+          // Add input event listeners for editable values
+          this.widthValue.addEventListener("input", this.handleWidthInput);
+          this.heightValue.addEventListener("input", this.handleHeightInput);
+          this.qualityValue.addEventListener("input", this.handleQualityInput);
 
           // Drag and drop events
           this.uploadArea.addEventListener("dragover", (e) =>
@@ -915,7 +930,7 @@
           const pixels = Math.round(
             this.originalDimensions.width * (percentage / 100)
           );
-          this.widthValue.textContent = `${pixels}px`;
+          this.widthValue.value = pixels;
         }
 
         updateHeightValue() {
@@ -923,11 +938,50 @@
           const pixels = Math.round(
             this.originalDimensions.height * (percentage / 100)
           );
-          this.heightValue.textContent = `${pixels}px`;
+          this.heightValue.value = pixels;
         }
 
         updateQualityValue() {
-          this.qualityValue.textContent = `${this.qualitySlider.value}%`;
+          this.qualityValue.value = this.qualitySlider.value;
+        }
+
+        handleWidthInput = (e) => {
+          let value = parseInt(e.target.value);
+          if (isNaN(value)) {
+            e.target.value = this.widthValue.value;
+            return;
+          }
+          
+          // Calculate percentage based on original width
+          const percentage = (value / this.originalDimensions.width) * 100;
+          this.widthSlider.value = Math.min(Math.max(percentage, 1), 100);
+          this.updatePreview();
+        }
+
+        handleHeightInput = (e) => {
+          let value = parseInt(e.target.value);
+          if (isNaN(value)) {
+            e.target.value = this.heightValue.value;
+            return;
+          }
+          
+          // Calculate percentage based on original height
+          const percentage = (value / this.originalDimensions.height) * 100;
+          this.heightSlider.value = Math.min(Math.max(percentage, 1), 100);
+          this.updatePreview();
+        }
+
+        handleQualityInput = (e) => {
+          let value = parseInt(e.target.value);
+          if (isNaN(value)) {
+            e.target.value = this.qualityValue.value;
+            return;
+          }
+          
+          // Ensure value is between 1 and 100
+          value = Math.min(Math.max(value, 1), 100);
+          this.qualitySlider.value = value;
+          this.updatePreview();
         }
 
         updatePreview() {
