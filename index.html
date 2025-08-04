@@ -1108,12 +1108,10 @@
           link.href = url;
 
           // Generate filename
-          const originalName = this.originalFile.name.replace(/\.[^/.]+$/, "");
-          const timestamp = new Date()
-            .toISOString()
-            .slice(0, 19)
-            .replace(/[:-]/g, "");
-          link.download = `${originalName}_compressed_${timestamp}.jpg`;
+          const originalName = this.originalFile.name;
+          const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.'));
+          const extension = originalName.split('.').pop();
+          link.download = `${nameWithoutExt}-compressed.${extension}`;
 
           document.body.appendChild(link);
           link.click();
